@@ -1,0 +1,26 @@
+---
+
+- name: update all installed packages for Redhat based systems
+  yum:
+    name: "*"
+    state: latest
+  register: patched
+  delay: 10
+  retries: 12
+  until: patched is successful
+
+- name: Reboot after updates for RedHat based systems have completed
+  shell: "sleep 5 && reboot"
+  async: 1
+  poll: 0
+  when: patched is changed
+
+- name: Wait for the reboot to complete
+  wait_for_connection:
+    connect_timeout: 30
+    sleep: 5
+    delay: 20
+    timeout: 300
+  when: patched is changed
+
+
