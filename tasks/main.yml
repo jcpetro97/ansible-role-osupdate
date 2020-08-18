@@ -1,9 +1,9 @@
 ---
 
 - name: Apply updates for CentOS or Redhat based system
-  include: Redhat.yml
+  include: ./Redhat.yml
   when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat" 
 
 - name: Apply updates for Debian or Ubuntu based system
-  include: Debian.yml
+  include: ./Debian.yml
   when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" 
