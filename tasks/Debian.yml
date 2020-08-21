@@ -3,6 +3,7 @@
 - name: apt-get update
   apt:
     update-cache: yes
+    cache_valid_time: 900
 
 - name: Apply updates for Debian/Ubuntu
   apt:
