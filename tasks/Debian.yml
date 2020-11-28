@@ -49,6 +49,7 @@
   register: patched
   delay: 10
   retries: 12
+  become_user: root
   until: patched is successful
 
 - name: Reboot after Debian/Ubuntu updates have completed
