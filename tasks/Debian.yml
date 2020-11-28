@@ -1,5 +1,5 @@
 ---
-   - name: Does /usr/bin/vboxmanage exist on the client
+  - name: Does /usr/bin/vboxmanage exist on the client
     stat:
       path: /usr/bin/vboxmanage
     register: myvboxmanage
