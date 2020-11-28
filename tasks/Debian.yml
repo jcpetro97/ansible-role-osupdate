@@ -54,6 +54,7 @@
 
 - name: Reboot after Debian/Ubuntu updates have completed
   shell: "sleep 5 && reboot"
+  become_user: root
   async: 1
   poll: 0
   when: patched is changed
