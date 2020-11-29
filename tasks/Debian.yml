@@ -1,20 +1,31 @@
 ---
+- name: apt-get update
+  apt:
+    update-cache: yes
+    cache_valid_time: 900
+
+- name: Do we have any updates to apply
+  shell: if apt-get --dry-run upgrade | grep -q "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded"; then echo "no"; else echo "yes"; fi
+  register: updates
+
+# if sudo apt-get --dry-run upgrade | grep -q "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded"; then echo "no"; else echo "yes"; fi
 - name: Does /usr/bin/vboxmanage exist on the client
   stat:
     path: /usr/bin/vboxmanage
   register: myvboxmanage
   changed_when: false
+  when: updates.stdout == "yes"
 
 - name: What user is /usr/bin/vboxmanage running as
   shell: ps -ef | egrep /usr/lib/virtualbox | grep -v grep | awk '{print $1}' | uniq
   register: vboxuser
   changed_when: false
-  when: myvboxmanage.stat.exists
+  when: updates.stdout == "yes" and myvboxmanage.stat.exists
 
 - name: Set UserName variable after determing what user vboxmanage is running as
   set_fact: UserName={{vboxuser.stdout}}
   changed_when: false    
-  when: myvboxmanage.stat.exists
+  when: updates.stdout == "yes" and myvboxmanage.stat.exists
 
 - name: Save the current state of the VM to disk and then stop the VM.
   shell: VBoxManage list runningvms | cut -d '"' -f 2 | while read machine; do    /usr/bin/vboxmanage controlvm "$machine" savestate; done
@@ -22,24 +33,19 @@
   async: 120
   poll: 5
   changed_when: false    
-  when: myvboxmanage.stat.exists
+  when: updates.stdout == "yes" and myvboxmanage.stat.exists
 
 - name: Check to see if the VirtualBox gui is running
   shell: /bin/ps -aux | grep -v grep | grep /usr/lib/virtualbox/VirtualBox | wc -l
   register: vbguiproc
   changed_when: false    
-  when: myvboxmanage.stat.exists   
+  when: updates.stdout == "yes" and myvboxmanage.stat.exists   
 
 - name: Shutdown VirtualBox gui if it is running
   shell: /bin/ps -ef | grep /usr/lib/virtualbox/VirtualBox | grep -v grep | kill -HUP `awk '{print $2}'`
   become_user: '{{UserName}}'
   changed_when: false    
-  when: myvboxmanage.stat.exists and vbguiproc.stdout != "0"
-
-- name: apt-get update
-  apt:
-    update-cache: yes
-    cache_valid_time: 900
+  when: updates.stdout == "yes" and myvboxmanage.stat.exists and vbguiproc.stdout != "0"
 
 - name: Apply updates for Debian/Ubuntu
   apt:
