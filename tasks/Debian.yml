@@ -9,8 +9,12 @@
   register: updates
   changed_when: false
 
-- meta: end_host
+- name: No Updates To Apply
+  meta:
+    end_host
   when: updates.stdout == "no"
+
+
 # if sudo apt-get --dry-run upgrade | grep -q "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded"; then echo "no"; else echo "yes"; fi
 - name: Does /usr/bin/vboxmanage exist on the client
   stat:
