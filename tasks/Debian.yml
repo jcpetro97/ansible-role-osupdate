@@ -11,7 +11,7 @@
 
 - name: No Updates to apply
   debug:
-    msg: "NO UPDATES TO APPLY FOR THIS HOST"
+    msg: "-------> NO UPDATES TO APPLY FOR THIS HOST <------------"
 - meta: end_host
   when: updates.stdout == "no"
 # if sudo apt-get --dry-run upgrade | grep -q "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded"; then echo "no"; else echo "yes"; fi
