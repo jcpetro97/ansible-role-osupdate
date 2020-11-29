@@ -7,7 +7,10 @@
 - name: Do we have any updates to apply
   shell: if apt-get --dry-run upgrade | grep -q "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded"; then echo "no"; else echo "yes"; fi
   register: updates
+  changed_when: false
 
+- meta: end_host
+  when: updates.stdout == "no"
 # if sudo apt-get --dry-run upgrade | grep -q "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded"; then echo "no"; else echo "yes"; fi
 - name: Does /usr/bin/vboxmanage exist on the client
   stat:
@@ -32,7 +35,6 @@
   become_user: '{{UserName}}'
   async: 120
   poll: 5
-  changed_when: false    
   when: updates.stdout == "yes" and myvboxmanage.stat.exists
 
 - name: Check to see if the VirtualBox gui is running
@@ -44,7 +46,6 @@
 - name: Shutdown VirtualBox gui if it is running
   shell: /bin/ps -ef | grep /usr/lib/virtualbox/VirtualBox | grep -v grep | kill -HUP `awk '{print $2}'`
   become_user: '{{UserName}}'
-  changed_when: false    
   when: updates.stdout == "yes" and myvboxmanage.stat.exists and vbguiproc.stdout != "0"
 
 - name: Apply updates for Debian/Ubuntu
