@@ -7,7 +7,7 @@
 - name: Do we have any updates to apply
   shell: if sudo apt-get --dry-run upgrade | grep -q "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded"; then echo "no"; else echo "yes"; fi
   register: updates
-  #changed_when: false
+  changed_when: false
 
 - name: No Updates to apply
   debug:
