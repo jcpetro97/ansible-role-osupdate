@@ -8,11 +8,12 @@
   shell: if sudo apt-get --dry-run upgrade | grep -q "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded"; then echo "no"; else echo "yes"; fi
   register: updates
   changed_when: false
+  when: Check is not defined
 
 - name: No Updates to apply
   debug:
     msg: "-------> NO UPDATES TO APPLY FOR THIS HOST <------------"
-  when: updates.stdout == "no"
+  when: updates.stdout == "no" and Check is not defined
   
 - name: End host 
   meta: end_host
