@@ -2,7 +2,7 @@
 - name: apt-get update
   apt:
     update-cache: yes
-    cache_valid_time: 900
+#    cache_valid_time: 900
 
 - name: Do we have any updates to apply
   shell: if sudo apt-get --dry-run upgrade | grep -q "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded"; then echo "no"; else echo "yes"; fi
