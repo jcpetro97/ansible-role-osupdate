@@ -1,0 +1,28 @@
+---
+- hosts: all
+  become: true
+  pre_tasks:
+  - name: check if /etc/apt/apt.conf.d/20auto-upgrades exists
+    stat: 
+      path: /etc/apt/apt.conf.d/20auto-upgrades
+    register: S20auto
+  - name: Disable Periodic Update Package Lists 
+    lineinfile:
+      path: /etc/apt/apt.conf.d/20auto-upgrades
+      regexp: '^APT::Periodic::Update-Package-Lists'
+      line: 'APT::Periodic::Update-Package-Lists "0";'
+      owner: root
+      group: root
+      mode: 0644
+    when: S20auto.stat.exists
+  - name: Disable Unattended Upgrade 
+    lineinfile:
+      path: /etc/apt/apt.conf.d/20auto-upgrades
+      regexp: '^APT::Periodic::Unattended-Upgrade'
+      line: 'APT::Periodic::Unattended-Upgrade "0";'
+      owner: root
+      group: root
+      mode: 0644 
+    when: S20auto.stat.exists
+  roles:
+    - role: OSUpdate
