@@ -1,9 +1,8 @@
 ---
+- name: Apply Updates for {{ ansible_os_family }}
+  include_tasks: "{{ ansible_os_family }}.yml"
+  when: ansible_distribution != "Ubuntu"
 
-- name: Apply updates for CentOS or Redhat based system
-  include: RedHat.yml
-  when: ansible_distribution == "CentOS" or ansible_distribution == "RedHat" 
-
-- name: Apply updates for Debian or Ubuntu based system
-  include: Debian.yml
-  when: ansible_distribution == "Ubuntu" or ansible_distribution == "Debian" 
+- name: Apply Updates for Ubuntu
+  include_tasks: "Ubuntu.yml"
+  when: ansible_distribution == "Ubuntu"

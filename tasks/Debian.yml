@@ -1,57 +1,10 @@
 ---
-- name: apt-get update
+- name: Debian | apt-get update
   apt:
     update-cache: yes
 #    cache_valid_time: 900
 
-- name: Do we have any updates to apply
-  shell: if sudo apt-get --dry-run upgrade | grep -w "^0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded$"; then echo "no"; else echo "yes"; fi
-  register: updates
-  changed_when: false
-
-- name: No Updates to apply
-  debug:
-    msg: "-------> NO UPDATES TO APPLY FOR THIS HOST <------------"
-  when: updates.stdout == "no" 
-- meta: end_host
-  when: updates.stdout == "no"
-# if sudo apt-get --dry-run upgrade | grep -q "0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded"; then echo "no"; else echo "yes"; fi
-- name: Does /usr/bin/vboxmanage exist on the client
-  stat:
-    path: /usr/bin/vboxmanage
-  register: myvboxmanage
-  changed_when: false
-
-- name: What user is /usr/bin/vboxmanage running as
-  shell: ps -ef | egrep /usr/lib/virtualbox | grep -v grep | awk '{print $1}' | uniq
-  register: vboxuser
-  changed_when: false
-  when: myvboxmanage.stat.exists
-
-- name: Set UserName variable after determing what user vboxmanage is running as
-  set_fact: UserName={{vboxuser.stdout}}
-  changed_when: false    
-  when: myvboxmanage.stat.exists
-
-- name: Save the current state of the VM to disk and then stop the VM.
-  shell: VBoxManage list runningvms | cut -d '"' -f 2 | while read machine; do    /usr/bin/vboxmanage controlvm "$machine" savestate; done
-  become_user: '{{UserName}}'
-  async: 120
-  poll: 5
-  when: myvboxmanage.stat.exists
-
-- name: Check to see if the VirtualBox gui is running
-  shell: /bin/ps -aux | grep -v grep | grep /usr/lib/virtualbox/VirtualBox | wc -l
-  register: vbguiproc
-  changed_when: false    
-  when: myvboxmanage.stat.exists   
-
-- name: Shutdown VirtualBox gui if it is running
-  shell: /bin/ps -ef | grep /usr/lib/virtualbox/VirtualBox | grep -v grep | kill -HUP `awk '{print $2}'`
-  become_user: '{{UserName}}'
-  when: myvboxmanage.stat.exists and vbguiproc.stdout != "0"
-
-- name: Apply updates for Debian/Ubuntu
+- name: Debian | Apply updates
   apt:
     upgrade:  dist
     autoremove: yes
@@ -62,14 +15,14 @@
   become_user: root
   until: patched is successful
 
-- name: Reboot after Debian/Ubuntu updates have completed
+- name: Debian | Reboot after updates have completed
   shell: "sleep 5 && reboot"
   become_user: root
   async: 1
   poll: 0
   when: patched is changed
 
-- name: Wait for the reboot to complete
+- name: Debian | Wait for the reboot to complete
   wait_for_connection:
     connect_timeout: 30
     sleep: 5
