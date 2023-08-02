@@ -1,4 +1,4 @@
-# OSUpdate.yml
+osupdate.yml
 
 Applies the OS updates for the host.  Once that is done, it reboots
 
@@ -9,7 +9,7 @@ To run the playbook, include this role in the top level playbook
   become: true
 
   roles:
-     - role:  OSUpdate
+     - role:  osupdate
 
 ```
 
