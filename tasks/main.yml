@@ -1,8 +1,8 @@
 ---
 - name: Apply Updates for {{ ansible_os_family }}
-  include_tasks: "{{ ansible_os_family }}.yml"
+  ansible.builtin.include_tasks: "{{ ansible_os_family }}.yml"
   when: ansible_distribution != "Ubuntu"
 
 - name: Apply Updates for Ubuntu
-  include_tasks: "Ubuntu.yml"
+  ansible.builtin.include_tasks: "Ubuntu.yml"
   when: ansible_distribution == "Ubuntu"
